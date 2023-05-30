@@ -128,10 +128,10 @@ class NotebookTask(PythonInstanceTask[T]):
         self,
         name: str,
         notebook_path: str,
-        output_path: str = None,
         render_deck: bool = False,
         stream_logs: bool = False,
         task_config: T = None,
+        output_path: typing.Optional[str] = None,
         inputs: typing.Optional[typing.Dict[str, typing.Type]] = None,
         outputs: typing.Optional[typing.Dict[str, typing.Type]] = None,
         **kwargs,
@@ -190,17 +190,19 @@ class NotebookTask(PythonInstanceTask[T]):
 
     @property
     def output_notebook_path(self) -> str:
-        if self._output_path:
-            return f"{self._output_path}/{self.notebook_path.split('/')[-1].split('.ipynb')[0]}-out.ipynb"
-        else:
-            return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
+        # if self._output_path:
+        return f"{self._output_path}/{self.notebook_path.split('/')[-1].split('.ipynb')[0]}-out.ipynb"
+        # else:
+            # return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
 
     @property
     def rendered_output_path(self) -> str:
-        if self._output_path:
-            return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
-        else:
-            return self._notebook_path.split(".ipynb")[0] + "-out.html"
+        return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
+
+        # if self._output_path:
+        #     return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
+        # else:
+        #     return self._notebook_path.split(".ipynb")[0] + "-out.html"
 
     def get_container(self, settings: SerializationSettings) -> task_models.Container:
         # The task name in the original command is incorrect because we use _dummy_task_func to construct the _config_task_instance.
