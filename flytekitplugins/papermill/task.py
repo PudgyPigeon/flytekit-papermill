@@ -128,6 +128,7 @@ class NotebookTask(PythonInstanceTask[T]):
         self,
         name: str,
         notebook_path: str,
+        output_notebook_dir: str,
         render_deck: bool = False,
         stream_logs: bool = False,
         task_config: T = None,
@@ -149,6 +150,8 @@ class NotebookTask(PythonInstanceTask[T]):
         task_type = f"{self._config_task_instance.task_type}"
         task_type_version = self._config_task_instance.task_type_version
         self._notebook_path = os.path.abspath(notebook_path)
+
+        self._output_notebook_dir = output_notebook_dir
 
         self._render_deck = render_deck
         self._stream_logs = stream_logs
@@ -187,11 +190,13 @@ class NotebookTask(PythonInstanceTask[T]):
 
     @property
     def output_notebook_path(self) -> str:
-        return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
+        return f"{self._output_notebook_dir}/{self.notebook_path.split('/')[-1].split('.ipynb')[0]}-out.ipynb"
+        #return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
 
     @property
     def rendered_output_path(self) -> str:
-        return self._notebook_path.split(".ipynb")[0] + "-out.html"
+        return f"{self._output_notebook_dir}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
+        #return self._notebook_path.split(".ipynb")[0] + "-out.html"
 
     def get_container(self, settings: SerializationSettings) -> task_models.Container:
         # The task name in the original command is incorrect because we use _dummy_task_func to construct the _config_task_instance.
