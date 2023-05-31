@@ -86,6 +86,10 @@ class NotebookTask(PythonInstanceTask[T]):
     -------
     The Task produces 2 implicit outputs.
 
+    The path of these 2 implicit outputs defaults to the same directory as the source notebook. However,
+    users can manually specify a directory they wish the outputs to be saved to with the ``output_path`` input
+    argument in the NotebookTask constructor.
+
     #. It captures the executed notebook in its entirety and is available from Flyte with the name ``out_nb``.
     #. It also converts the captured notebook into an ``html`` page, which the FlyteConsole will render called -
        ``out_rendered_nb``. If ``render_deck=True`` is passed, this html content will be inserted into a deck.
@@ -197,7 +201,6 @@ class NotebookTask(PythonInstanceTask[T]):
 
     @property
     def rendered_output_path(self) -> str:
-        # return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
         if self._output_path:
             return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
         else:
