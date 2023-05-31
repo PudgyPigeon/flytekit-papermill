@@ -190,19 +190,18 @@ class NotebookTask(PythonInstanceTask[T]):
 
     @property
     def output_notebook_path(self) -> str:
-        # if self._output_path:
-        return f"{self._output_path}/{self.notebook_path.split('/')[-1].split('.ipynb')[0]}-out.ipynb"
-        # else:
-            # return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
+        if self._output_path:
+            return f"{self._output_path}/{self.notebook_path.split('/')[-1].split('.ipynb')[0]}-out.ipynb"
+        else:
+            return self._notebook_path.split(".ipynb")[0] + "-out.ipynb"
 
     @property
     def rendered_output_path(self) -> str:
-        return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
-
-        # if self._output_path:
-        #     return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
-        # else:
-        #     return self._notebook_path.split(".ipynb")[0] + "-out.html"
+        # return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
+        if self._output_path:
+            return f"{self._output_path}/{self._notebook_path.split('/')[-1].split('.ipynb')[0]}-out.html"
+        else:
+            return self._notebook_path.split(".ipynb")[0] + "-out.html"
 
     def get_container(self, settings: SerializationSettings) -> task_models.Container:
         # The task name in the original command is incorrect because we use _dummy_task_func to construct the _config_task_instance.
