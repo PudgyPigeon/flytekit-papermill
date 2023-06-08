@@ -136,6 +136,7 @@ class NotebookTask(PythonInstanceTask[T]):
         stream_logs: bool = False,
         task_config: T = None,
         output_path: typing.Optional[str] = None,
+        kernel_name: typing.Optional[str] = None,
         inputs: typing.Optional[typing.Dict[str, typing.Type]] = None,
         outputs: typing.Optional[typing.Dict[str, typing.Type]] = None,
         **kwargs,
@@ -155,7 +156,10 @@ class NotebookTask(PythonInstanceTask[T]):
         task_type_version = self._config_task_instance.task_type_version
         self._notebook_path = os.path.abspath(notebook_path)
 
+        # Output path for Jupyter to write to
         self._output_path = output_path
+        # Kernel name to use for Jupyter process: ie. "python3"
+        self._kernel_name = kernel_name
 
         self._render_deck = render_deck
         self._stream_logs = stream_logs
@@ -187,6 +191,10 @@ class NotebookTask(PythonInstanceTask[T]):
             interface=Interface(inputs=inputs, outputs=outputs),
             **kwargs,
         )
+
+    @property
+    def kernel_name(self) -> str:
+        return self._kernel_name if self._kernel_name else None
 
     @property
     def notebook_path(self) -> str:
@@ -279,7 +287,10 @@ class NotebookTask(PythonInstanceTask[T]):
                 kwargs[k] = save_python_val_to_file(v)
 
         # Execute Notebook via Papermill.
-        pm.execute_notebook(self._notebook_path, self.output_notebook_path, parameters=kwargs, log_output=self._stream_logs)  # type: ignore
+        if self.kernel_name:
+            pm.execute_notebook(self._notebook_path, self.output_notebook_path, kernel_name=self.kernel_name, parameters=kwargs, log_output=self._stream_logs)  # type: ignore
+        else:
+            pm.execute_notebook(self._notebook_path, self.output_notebook_path, parameters=kwargs, log_output=self._stream_logs)  # type: ignore
 
         outputs = self.extract_outputs(self.output_notebook_path)
         self.render_nb_html(self.output_notebook_path, self.rendered_output_path)
