@@ -11,7 +11,7 @@ plugin_requires = [
     "ipykernel>=5.0.0",
 ]
 
-__version__ = "0.0.0+develop"
+__version__ = "1.6.0+aiq-dev"
 
 setup(
     name=microlib_name,

@@ -74,9 +74,11 @@ class NotebookTask(PythonInstanceTask[T]):
             name="modulename.my_notebook_task", # the name should be unique within all your tasks, usually it is a good
                                                # idea to use the modulename
             notebook_path="../path/to/my_notebook",
+            output_path="/path/to/write/to",            # Optional. Defaults to notebook path directory
             render_deck=True,
             inputs=kwtypes(v=int),
             outputs=kwtypes(x=int, y=str),
+            pod_template_name="string_name_here",      # Optional. Pod template name. Config inherited from parent class
             metadata=TaskMetadata(retries=3, cache=True, cache_version="1.0"),
         )
 
@@ -141,6 +143,23 @@ class NotebookTask(PythonInstanceTask[T]):
         outputs: typing.Optional[typing.Dict[str, typing.Type]] = None,
         **kwargs,
     ):
+        """
+
+        Args:
+            name (str): Name of the Notebook Task
+            notebook_path (str): Absolute path pointing towards Jupyter file
+            render_deck (bool, optional): Whether to render output in the Flyte Web Console. Defaults to False.
+            stream_logs (bool, optional): Whether to pipe Papermill stdout to pod logs. Notes below in source code. Defaults to False.
+            task_config (T, optional): Task config inherited from Flyte environment. Defaults to None.
+            output_path (typing.Optional[str], optional): Path to write output notebooks to. Will overwrite when same path
+                specified for multiple tasks in a dynamic workflow. Point to path within Docker container (Not shared NFS) to avoid this behaviour. Defaults to None.
+            kernel_name (typing.Optional[str], optional): Name of kernel for Jupyter to use - will use kernel in metadata JSON if not specified. Defaults to None.
+            inputs (typing.Optional[typing.Dict[str, typing.Type]], optional): Input arguments to pass into task. Defaults to None.
+            outputs (typing.Optional[typing.Dict[str, typing.Type]], optional): Output arguments to pass out of notebook task and into workflows. Defaults to None.
+
+        Raises:
+            ValueError: Raised when nonexistent/non-accessible path is provided for notebooks.
+        """
         # Each instance of NotebookTask instantiates an underlying task with a dummy function that will only be used
         # to run pre- and post- execute functions using the corresponding task plugin.
         # We rename the function name here to ensure the generated task has a unique name and avoid duplicate task name
@@ -278,6 +297,7 @@ class NotebookTask(PythonInstanceTask[T]):
         """
         TODO: Figure out how to share FlyteContext ExecutionParameters with the notebook kernel (as notebook kernel
              is executed in a separate python process)
+
         For Spark, the notebooks today need to use the new_session or just getOrCreate session and get a handle to the
         singleton
         """
